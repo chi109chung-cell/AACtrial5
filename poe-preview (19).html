@@ -1,0 +1,2016 @@
+<!DOCTYPE html><html lang="zh-Hant"><head><meta name="x-poe-datastore-behavior" content="local_only"><meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob: https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://code.jquery.com https://unpkg.com https://d3js.org https://threejs.org https://cdn.plot.ly https://stackpath.bootstrapcdn.com https://maps.googleapis.com https://cdn.tailwindcss.com https://ajax.googleapis.com https://kit.fontawesome.com https://cdn.datatables.net https://maxcdn.bootstrapcdn.com https://code.highcharts.com https://tako-static-assets-production.s3.amazonaws.com https://www.youtube.com https://fonts.googleapis.com https://fonts.gstatic.com https://pfst.cf2.poecdn.net https://puc.poecdn.net https://i.imgur.com https://wikimedia.org https://*.icons8.com https://*.giphy.com https://picsum.photos https://images.unsplash.com; frame-src 'self' https://www.youtube.com https://trytako.com; child-src 'self'; manifest-src 'self'; worker-src 'self'; upgrade-insecure-requests; block-all-mixed-content;">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>街市買餸 AAC 溝通板</title>
+  <style>
+    :root {
+      --blue: #2563eb;
+      --blue-dark: #1d4ed8;
+      --blue-soft: #bbdefb;
+      --yellow: #fff176;
+      --orange-soft: #ffe0b2;
+      --bg: #f6f9fc;
+      --line: #dbe4ef;
+      --text: #0f172a;
+      --muted: #64748b;
+      --shadow: 0 3px 8px rgba(15, 23, 42, 0.18);
+      --radius: 14px;
+      --card-gap: 16px;
+      --font: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans TC", "Microsoft JhengHei", Arial, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      margin: 0;
+      min-height: 100%;
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font);
+    }
+
+    body {
+      overflow-x: hidden;
+    }
+
+    button, input, select, textarea {
+      font-family: inherit;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    .app {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background: #f8fbff;
+    }
+
+    .topbar {
+      height: 56px;
+      background: white;
+      border-bottom: 1px solid var(--line);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 12px;
+      gap: 12px;
+      box-shadow: 0 1px 4px rgba(15,23,42,.08);
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+    }
+
+    .brand-icon {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #4f46e5, #2563eb);
+      display: grid;
+      place-items: center;
+      color: white;
+      flex-shrink: 0;
+      box-shadow: var(--shadow);
+    }
+
+    .brand-title-wrap {
+      min-width: 0;
+    }
+
+    .brand-title-line {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .brand-title {
+      font-size: 18px;
+      font-weight: 800;
+      line-height: 1;
+      white-space: nowrap;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      color: var(--blue-dark);
+      background: #dbeafe;
+      border: 1px solid #bfdbfe;
+      border-radius: 999px;
+      padding: 2px 8px;
+      font-size: 12px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .subtitle {
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 3px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .toolbar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .small-btn, .select {
+      border: 1px solid #cbd5e1;
+      background: #f8fafc;
+      color: #1e40af;
+      border-radius: 8px;
+      padding: 7px 10px;
+      font-size: 13px;
+      font-weight: 650;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      min-height: 32px;
+      box-shadow: 0 1px 2px rgba(15,23,42,.04);
+    }
+
+    .small-btn:hover, .select:hover {
+      background: #eff6ff;
+    }
+
+    .small-btn.active {
+      background: #dbeafe;
+      border-color: #60a5fa;
+      color: #1d4ed8;
+    }
+
+    .small-btn.green {
+      color: white;
+      background: #059669;
+      border-color: #047857;
+    }
+
+    .small-btn.red {
+      color: white;
+      background: #e11d48;
+      border-color: #be123c;
+    }
+
+    .small-btn.gray {
+      color: #334155;
+      background: #f1f5f9;
+    }
+
+    .sentence-zone {
+      background: white;
+      border-bottom: 1px solid var(--line);
+      padding: 10px 12px;
+      display: flex;
+      align-items: stretch;
+      gap: 8px;
+      position: sticky;
+      top: 56px;
+      z-index: 40;
+      box-shadow: 0 1px 2px rgba(15,23,42,.04);
+    }
+
+    .play-btn {
+      min-width: 70px;
+      border: 0;
+      border-radius: 11px;
+      background: #059669;
+      color: white;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-size: 16px;
+      box-shadow: 0 2px 5px rgba(15,23,42,.15);
+    }
+
+    .play-btn .count {
+      background: rgba(0,0,0,.18);
+      border-radius: 999px;
+      min-width: 25px;
+      height: 25px;
+      display: grid;
+      place-items: center;
+      font-size: 13px;
+    }
+
+    .sentence-bar {
+      flex: 1;
+      min-height: 56px;
+      border: 1.5px dashed #fbbf24;
+      background: #fffdf5;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 10px;
+      overflow-x: auto;
+    }
+
+    .sentence-placeholder {
+      color: #94a3b8;
+      font-size: 14px;
+      font-style: italic;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      white-space: nowrap;
+    }
+
+    .sentence-chip {
+      flex: 0 0 auto;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      color: #0f172a;
+      border-radius: 10px;
+      padding: 5px 8px;
+      font-weight: 700;
+      min-height: 38px;
+      box-shadow: 0 1px 2px rgba(15,23,42,.08);
+    }
+
+    .sentence-chip img {
+      width: 30px;
+      height: 30px;
+      object-fit: cover;
+      border-radius: 5px;
+      background: white;
+    }
+
+    .sentence-chip span {
+      display: flex;
+      flex-direction: column;
+      line-height: 1.05;
+    }
+
+    .sentence-chip small {
+      color: var(--muted);
+      font-weight: 600;
+      font-size: 11px;
+    }
+
+    .icon-btn {
+      width: 40px;
+      min-width: 40px;
+      border-radius: 10px;
+      border: 1px solid #cbd5e1;
+      background: #f8fafc;
+      color: #334155;
+      display: grid;
+      place-items: center;
+      font-size: 17px;
+    }
+
+    .icon-btn.remove {
+      color: #e11d48;
+      border-color: #fecdd3;
+      background: #fff1f2;
+    }
+
+    .breadcrumb-row {
+      min-height: 50px;
+      background: #f8fbff;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 16px;
+      border-bottom: 1px solid var(--line);
+      gap: 10px;
+    }
+
+    .crumbs {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #1e3a8a;
+      font-size: 14px;
+      font-weight: 700;
+      flex-wrap: wrap;
+    }
+
+    .crumb-btn {
+      border: 0;
+      background: transparent;
+      color: #2563eb;
+      font-weight: 750;
+      padding: 4px 3px;
+    }
+
+    .grid-wrap {
+      padding: 16px;
+      flex: 1;
+    }
+
+    .grid {
+      display: grid;
+      gap: var(--card-gap);
+    }
+
+    .grid.cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .grid.cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .grid.cols-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+
+    .aac-card {
+      position: relative;
+      background: var(--blue-soft);
+      border-radius: var(--radius);
+      padding: 12px;
+      min-height: 164px;
+      border: 1px solid #a9d5f8;
+      box-shadow: var(--shadow);
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      transition: transform .08s ease, box-shadow .08s ease;
+      user-select: none;
+    }
+
+    .aac-card:active {
+      transform: scale(.99);
+    }
+
+    .aac-card.dragging {
+      opacity: .45;
+      outline: 3px dashed #2563eb;
+    }
+
+    .aac-card.drag-over {
+      outline: 4px solid #22c55e;
+    }
+
+    .aac-image-box {
+      height: 80px;
+      background: #eef6fc;
+      border-radius: 10px;
+      overflow: hidden;
+      display: grid;
+      place-items: center;
+      position: relative;
+    }
+
+    .aac-image-box img {
+      max-height: 100%;
+      max-width: 55%;
+      object-fit: cover;
+    }
+
+    .aac-image-fallback {
+      display: none;
+      font-size: 13px;
+      color: #64748b;
+      text-align: center;
+      padding: 6px;
+      line-height: 1.2;
+      font-weight: 700;
+    }
+
+    .aac-label-box {
+      background: rgba(255,255,255,.85);
+      border-radius: 10px;
+      min-height: 48px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 6px;
+      line-height: 1.15;
+      text-align: center;
+    }
+
+    .zh-label {
+      font-size: 16px;
+      font-weight: 850;
+      color: #111827;
+    }
+
+    .en-label {
+      margin-top: 4px;
+      font-size: 13px;
+      color: #475569;
+      font-weight: 600;
+    }
+
+    .folder-pill {
+      position: absolute;
+      top: 8px;
+      left: 8px;
+      z-index: 2;
+      background: #2563eb;
+      color: white;
+      border-radius: 7px;
+      font-size: 12px;
+      font-weight: 800;
+      padding: 3px 8px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      box-shadow: 0 1px 2px rgba(15,23,42,.18);
+    }
+
+    .card-edit-actions {
+      position: absolute;
+      right: 8px;
+      top: 8px;
+      display: flex;
+      gap: 5px;
+      z-index: 5;
+    }
+
+    .card-edit-actions button {
+      width: 31px;
+      height: 31px;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      background: rgba(255,255,255,.96);
+      color: #1e40af;
+      font-size: 14px;
+      box-shadow: 0 1px 3px rgba(15,23,42,.12);
+    }
+
+    .editor-floating {
+      position: fixed;
+      right: 16px;
+      bottom: 16px;
+      width: 360px;
+      max-width: calc(100vw - 32px);
+      background: rgba(255,255,255,.97);
+      border: 1px solid #cbd5e1;
+      border-radius: 16px;
+      box-shadow: 0 14px 34px rgba(15,23,42,.25);
+      z-index: 80;
+      display: none;
+      overflow: hidden;
+      backdrop-filter: blur(8px);
+    }
+
+    .editor-floating.open {
+      display: block;
+    }
+
+    .editor-mini-header {
+      padding: 10px 12px;
+      background: #eff6ff;
+      border-bottom: 1px solid #dbeafe;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .editor-mini-title {
+      font-size: 15px;
+      font-weight: 850;
+      color: #1e3a8a;
+    }
+
+    .editor-mini-body {
+      padding: 10px;
+    }
+
+    .editor-mini-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+    }
+
+    .editor-advanced {
+      margin-top: 10px;
+      border-top: 1px solid #e2e8f0;
+      padding-top: 10px;
+      display: none;
+      max-height: 55vh;
+      overflow-y: auto;
+    }
+
+    .editor-advanced.open {
+      display: block;
+    }
+
+    .editor-section {
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 12px;
+      margin-bottom: 12px;
+      background: #fbfdff;
+    }
+
+    .editor-section h3 {
+      margin: 0 0 10px;
+      font-size: 15px;
+      color: #0f172a;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .field {
+      margin-bottom: 10px;
+    }
+
+    .field label {
+      display: block;
+      font-size: 12px;
+      font-weight: 800;
+      color: #334155;
+      margin-bottom: 4px;
+    }
+
+    .field input, .field select, .field textarea {
+      width: 100%;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      padding: 9px;
+      font-size: 14px;
+      background: white;
+    }
+
+    .field textarea {
+      min-height: 70px;
+      resize: vertical;
+    }
+
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .editor-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 8px;
+    }
+
+    .editor-actions .small-btn {
+      flex: 1 1 auto;
+      justify-content: center;
+    }
+
+    .help-text {
+      font-size: 12px;
+      color: #64748b;
+      line-height: 1.45;
+    }
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(15,23,42,.42);
+      z-index: 130;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+
+    .modal-backdrop.show {
+      display: flex;
+    }
+
+    .modal {
+      width: 560px;
+      max-width: 100%;
+      max-height: 92vh;
+      overflow: auto;
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 18px 50px rgba(15,23,42,.35);
+      border: 1px solid #e2e8f0;
+    }
+
+    .modal-header {
+      padding: 14px 16px;
+      border-bottom: 1px solid #e2e8f0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #f8fafc;
+    }
+
+    .modal-header h3 {
+      margin: 0;
+      font-size: 18px;
+    }
+
+    .modal-body {
+      padding: 16px;
+    }
+
+    .modal-footer {
+      padding: 12px 16px;
+      border-top: 1px solid #e2e8f0;
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      background: #f8fafc;
+      flex-wrap: wrap;
+    }
+
+    .image-preview-box {
+      border: 1px dashed #93c5fd;
+      background: #f8fbff;
+      border-radius: 12px;
+      min-height: 130px;
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+      padding: 10px;
+      margin-top: 8px;
+    }
+
+    .image-preview-box img {
+      max-width: 100%;
+      max-height: 180px;
+      object-fit: contain;
+      border-radius: 8px;
+      background: white;
+    }
+
+    .preview-placeholder {
+      color: #64748b;
+      text-align: center;
+      font-size: 13px;
+      line-height: 1.5;
+      font-weight: 700;
+    }
+
+    .preview-status {
+      font-size: 12px;
+      color: #64748b;
+      margin-top: 6px;
+      font-weight: 700;
+    }
+
+    .preview-status.ok {
+      color: #059669;
+    }
+
+    .preview-status.bad {
+      color: #e11d48;
+    }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 24px;
+      transform: translateX(-50%);
+      background: #0f172a;
+      color: white;
+      border-radius: 999px;
+      padding: 10px 16px;
+      font-weight: 700;
+      z-index: 200;
+      box-shadow: 0 8px 22px rgba(15,23,42,.35);
+      display: none;
+    }
+
+    .toast.show {
+      display: block;
+    }
+
+    .drop-hint {
+      border: 2px dashed #93c5fd;
+      border-radius: 12px;
+      background: #eff6ff;
+      color: #1e40af;
+      padding: 10px;
+      font-size: 13px;
+      font-weight: 700;
+      margin-bottom: 12px;
+      line-height: 1.4;
+    }
+
+    .home-list {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .home-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px;
+      border: 1px solid #e2e8f0;
+      border-radius: 9px;
+      background: white;
+    }
+
+    .home-row span {
+      flex: 1;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    @media (max-width: 980px) {
+      .grid.cols-3, .grid.cols-4 {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+      .toolbar {
+        gap: 5px;
+      }
+      .small-btn, .select {
+        font-size: 12px;
+        padding: 7px 8px;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .topbar {
+        height: auto;
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .sentence-zone {
+        top: 86px;
+        flex-wrap: wrap;
+      }
+
+      .play-btn {
+        min-height: 48px;
+      }
+
+      .grid-wrap {
+        padding: 10px;
+      }
+
+      .grid.cols-2, .grid.cols-3, .grid.cols-4 {
+        grid-template-columns: 1fr;
+      }
+
+      .aac-card {
+        min-height: 150px;
+      }
+
+      .breadcrumb-row {
+        padding: 8px 10px;
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .brand-title {
+        font-size: 17px;
+      }
+
+      .subtitle {
+        white-space: normal;
+      }
+
+      .toolbar {
+        width: 100%;
+        justify-content: flex-start;
+      }
+
+      .two-col {
+        grid-template-columns: 1fr;
+      }
+
+      .editor-floating {
+        left: 8px;
+        right: 8px;
+        bottom: 8px;
+        width: auto;
+        max-width: none;
+      }
+
+      .editor-mini-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+<div class="app">
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-icon" aria-hidden="true">
+        <svg width="25" height="25" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M4 4h16a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H9l-5 4v-4H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"></path>
+        </svg>
+      </div>
+      <div class="brand-title-wrap">
+        <div class="brand-title-line">
+          <div class="brand-title">街市買餸</div>
+          <span class="badge">AAC 溝通板</span>
+        </div>
+        <div class="subtitle">粵語主導 / Dual Cantonese &amp; English Voice</div>
+      </div>
+    </div>
+
+    <div class="toolbar">
+      <select id="gridSelect" class="select" aria-label="Grid layout">
+        <option value="2">▦ 4格 (2x2)</option>
+        <option value="3" selected="">▦ 9格 (3x3)</option>
+        <option value="4">▦ 16格 (4x4)</option>
+      </select>
+      <button class="small-btn" id="voiceBtn">🔊 語音設定</button>
+      <button class="small-btn" id="editorToggle">👥 言語治療師模式</button>
+    </div>
+  </header>
+
+  <section class="sentence-zone">
+    <button id="playSentenceBtn" class="play-btn" aria-label="播放句子">
+      ▶ <span class="count" id="sentenceCount">0</span>
+    </button>
+    <div class="sentence-bar" id="sentenceBar">
+      <div class="sentence-placeholder">👆 點擊下方圖片卡以加入句子並發聲 (Tap cards to speak and add to sentence)...</div>
+    </div>
+    <button class="icon-btn remove" id="clearSentenceBtn" title="清除句子">✖</button>
+    <button class="icon-btn" id="backspaceBtn" title="刪除最後一項">🗑</button>
+  </section>
+
+  <section class="breadcrumb-row">
+    <div class="crumbs" id="breadcrumbs"></div>
+    <button class="small-btn" id="homeBtn">🏠 街市首頁 (Home)</button>
+  </section>
+
+  <main class="grid-wrap">
+    <div id="editorHint" class="drop-hint" style="display:none;">
+      ✏️ 編輯提示：現在工具箱不會遮擋卡片。你可以直接按卡片右上角「✎」編輯圖片、名稱及資料夾；也可拖拉卡片重新排序，或拖到分類資料夾中。
+    </div>
+    <div id="boardGrid" class="grid cols-3"></div>
+  </main>
+</div>
+
+<div id="editorFloating" class="editor-floating" aria-label="Speech therapist editor toolbox">
+  <div class="editor-mini-header">
+    <div class="editor-mini-title">👥 言語治療師模式</div>
+    <div style="display:flex; gap:6px;">
+      <button class="small-btn" id="advancedToggle">進階</button>
+      <button class="icon-btn" id="closeEditor">✕</button>
+    </div>
+  </div>
+
+  <div class="editor-mini-body">
+    <div class="editor-mini-grid">
+      <button class="small-btn green" id="addItemBtn">➕ 新增項目</button>
+      <button class="small-btn green" id="addFolderBtn">📂 新增資料夾</button>
+      <button class="small-btn" id="exportQuickBtn">💾 匯出</button>
+      <button class="small-btn gray" id="testVoiceBtn">🔊 試聲</button>
+    </div>
+
+    <div id="advancedEditor" class="editor-advanced">
+      <div class="editor-section">
+        <h3>🏠 首頁管理 / Home Pages</h3>
+        <div class="field">
+          <label>目前首頁 / Current Home</label>
+          <select id="homeSelect"></select>
+        </div>
+        <div class="editor-actions">
+          <button class="small-btn" id="setHomeBtn">設為首頁</button>
+          <button class="small-btn green" id="newHomeBtn">建立新首頁</button>
+        </div>
+        <div class="home-list" id="homeList"></div>
+      </div>
+
+      <div class="editor-section">
+        <h3>🧩 目前頁面 / Current Board</h3>
+        <div class="field">
+          <label>頁面名稱 / Board Name</label>
+          <input id="boardNameInput" type="text">
+        </div>
+        <div class="editor-actions">
+          <button class="small-btn" id="renameBoardBtn">儲存名稱</button>
+          <button class="small-btn red" id="deleteBoardBtn">刪除此頁</button>
+        </div>
+      </div>
+
+      <div class="editor-section">
+        <h3>💾 匯入 / 匯出</h3>
+        <div class="editor-actions">
+          <button class="small-btn" id="exportBtn">匯出 JSON</button>
+          <button class="small-btn" id="importBtn">匯入 JSON</button>
+          <button class="small-btn gray" id="resetBtn">還原範本</button>
+        </div>
+        <textarea id="jsonBox" placeholder="JSON 會顯示在這裡 / Paste JSON here"></textarea>
+      </div>
+
+      <div class="editor-section">
+        <h3>🔊 語音友善設定</h3>
+        <div class="two-col">
+          <div class="field">
+            <label>速度 / Rate</label>
+            <input id="rateInput" type="number" min="0.4" max="1.2" step="0.05" value="0.72">
+          </div>
+          <div class="field">
+            <label>音調 / Pitch</label>
+            <input id="pitchInput" type="number" min="0.7" max="1.3" step="0.05" value="0.95">
+          </div>
+        </div>
+        <div class="field">
+          <label>兩語之間停頓毫秒 / Pause ms</label>
+          <input id="pauseInput" type="number" min="100" max="2500" step="100" value="650">
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="modalBackdrop" class="modal-backdrop">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="modalTitle">編輯</h3>
+      <button class="icon-btn" id="modalClose">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="editId">
+      <input type="hidden" id="editMode">
+
+      <div class="two-col">
+        <div class="field">
+          <label>中文名稱 / Chinese</label>
+          <input id="zhInput" type="text" placeholder="例如：豬肉">
+        </div>
+        <div class="field">
+          <label>英文名稱 / English</label>
+          <input id="enInput" type="text" placeholder="e.g. Pork">
+        </div>
+      </div>
+
+      <div class="field">
+        <label>圖片網址 / Image URL</label>
+        <input id="imageInput" type="text" placeholder="https://...">
+        <div class="editor-actions">
+          <button class="small-btn" id="refreshPreviewBtn" type="button">🖼️ 預覽圖片</button>
+          <button class="small-btn gray" id="clearImageBtn" type="button">清除圖片</button>
+        </div>
+        <div class="image-preview-box" id="imagePreviewBox">
+          <div class="preview-placeholder">未有圖片預覽<br>No image preview</div>
+        </div>
+        <div id="previewStatus" class="preview-status">請貼上圖片網址，系統會即時預覽。</div>
+      </div>
+
+      <div class="two-col">
+        <div class="field">
+          <label>背景顏色 / Background</label>
+          <input id="bgInput" type="color" value="#fff176">
+        </div>
+        <div class="field">
+          <label>類型 / Type</label>
+          <select id="typeInput">
+            <option value="button">項目 Button</option>
+            <option value="folder">資料夾 Folder</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="field" id="folderTargetWrap">
+        <label>資料夾連到頁面 / Folder target board</label>
+        <select id="folderTargetInput"></select>
+      </div>
+
+      <div class="field">
+        <label>移到資料夾 / Move to folder</label>
+        <select id="moveTargetInput">
+          <option value="">留在目前頁面 / Stay here</option>
+        </select>
+      </div>
+
+      <p class="help-text">
+        圖片預覽可幫助你確認新圖片是否成功載入。若在匯出後圖片不能顯示，多數是圖片來源伺服器阻擋外部網站載入；建議使用可公開存取的圖片網址。
+      </p>
+    </div>
+    <div class="modal-footer">
+      <button class="small-btn gray" id="previewSpeechBtn">🔊 試聽</button>
+      <button class="small-btn" id="saveItemBtn">儲存 Save</button>
+      <button class="small-btn red" id="deleteItemBtn">刪除 Delete</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script>
+const INITIAL_BOARDS = [
+  {
+    "id": "6abe7deea6bb41b87362bba8",
+    "name": "街市買餸",
+    "isRoot": true,
+    "tiles": [
+      {
+        "id": "1GuFatHcX",
+        "label": "菇 Mushroom",
+        "type": "folder",
+        "loadBoard": "6ac25c37a6bb41b8736618e0",
+        "image": "https://cdncboard.azureedge.net/cblob/_1791124440_1d943a49a0d1_images-4.jpeg",
+        "backgroundColor": "#bbdefb"
+      },
+      {
+        "id": "S1LQGA9p7qK-",
+        "label": "蔬菜 Vegetable",
+        "type": "folder",
+        "loadBoard": "6abe7f56a6bb41b87362bd5e",
+        "image": "https://cdncboard.azureedge.net/cblob/_1790869109_1d943a49a0d1_%E8%94%AC%E8%8F%9C.jpg",
+        "backgroundColor": "rgb(187, 222, 251)"
+      },
+      {
+        "id": "Hy-Y0OzBW",
+        "label": "豬肉 Pork",
+        "type": "folder",
+        "loadBoard": "6ac22772e9b569f4dc242523",
+        "image": "https://cdncboard.azureedge.net/cblob/_1791124217_1d943a49a0d1_14-01%E8%B1%AC%E8%82%89%E6%98%AF%E5%B8%B8%E8%A6%8B%E7%9A%84%E8%82%89%E9%A1%9E_n.jpg",
+        "backgroundColor": "#bbdefb"
+      },
+      {
+        "id": "aDemihk0z",
+        "label": "牛 Beef",
+        "type": "folder",
+        "loadBoard": "6ac25d97e9b569f4dc244fc0",
+        "image": "https://cdncboard.azureedge.net/cblob/_1791124268_1d943a49a0d1_all_beef.webp",
+        "backgroundColor": "#bbdefb"
+      },
+      {
+        "id": "vKl5c8sEL",
+        "label": "雞 Chicken",
+        "type": "folder",
+        "loadBoard": "6ac26203a6bb41b873661ec5",
+        "image": "https://cdncboard.azureedge.net/cblob/_1791124314_1d943a49a0d1_6ace73ac8140ab9f.jpg",
+        "backgroundColor": "#bbdefb"
+      },
+      {
+        "id": "XrE_XweW4",
+        "label": "羊 Mutton",
+        "type": "folder",
+        "loadBoard": "6ac25eba9707f685afb8daeb",
+        "image": "https://cdncboard.azureedge.net/cblob/_1791124346_cdfc356103b3_images-3.jpeg",
+        "backgroundColor": "#bbdefb"
+      },
+      {
+        "id": "7omQKIZs4",
+        "label": "海鮮 Seafood",
+        "type": "folder",
+        "loadBoard": "6ac22843e9b569f4dc2425bb",
+        "image": "https://cdncboard.azureedge.net/cblob/_1791120858_0361109c3372__116559066_cbc41cd5-358d-40e4-84f2-7d00042cbad0.jpg.webp",
+        "backgroundColor": "#bbdefb"
+      },
+      {
+        "id": "KBEAjHU3c",
+        "label": "燒味 Siu Mei",
+        "type": "folder",
+        "loadBoard": "6ac24964e9b569f4dc243e5a",
+        "image": "https://cdncboard.azureedge.net/cblob/_1791120876_1d943a49a0d1_5e3434fbbd5f4161baa4b6d74b674969_hanging-siu-mei-roasted-meat.jpg",
+        "backgroundColor": "#bbdefb"
+      },
+      {
+        "id": "PffTZ9om1",
+        "label": "生果 Fruit",
+        "type": "folder",
+        "loadBoard": "6ac24888e9b569f4dc243cec",
+        "image": "https://cdncboard.azureedge.net/cblob/_1791120869_1d943a49a0d1_delicious-rainbow-fruits-royalty-free-image-1730693556.jpg.avif",
+        "backgroundColor": "#bbdefb"
+      },
+      {
+        "id": "tfg8FUPO0",
+        "label": "冷凍食品 Frozen food",
+        "type": "folder",
+        "loadBoard": "6ac24de9e9b569f4dc244215",
+        "image": "https://cdncboard.azureedge.net/cblob/_1791120886_cdfc356103b3_content_6dde7bf3-c6ab-48bd-883d-878d72e49082.avif",
+        "backgroundColor": "#bbdefb"
+      },
+      {
+        "id": "card_mvfchxx5",
+        "label": "蒸 Steam",
+        "image": "",
+        "backgroundColor": "#ffe0b2",
+        "type": "button"
+      },
+      {
+        "id": "card_mvfch9jv",
+        "label": "烹飪方式 Cooking Style",
+        "image": "",
+        "backgroundColor": "#ffe0b2",
+        "type": "folder",
+        "loadBoard": "6abe7deea6bb41b87362bba8"
+      }
+    ]
+  },
+  {
+    "id": "6abe7f56a6bb41b87362bd5e",
+    "name": "蔬菜",
+    "tiles": [
+      { "id": "rkZSf0q6XqK-", "label": "西芹 Celery", "image": "https://cdncboard.azureedge.net/cblob/_1790908577_1d943a49a0d1_gemini_generated_image_siqcxksiqcxksiqc.jpg", "backgroundColor": "#fff176" },
+      { "id": "H2lyWFXhQ", "label": "西洋菜 Watercress", "image": "https://cdncboard.azureedge.net/cblob/_1790908564_0361109c3372_gemini_generated_image_8amvyn8amvyn8amv.jpg", "backgroundColor": "#fff176" },
+      { "id": "rByniBYaI", "label": "芥蘭 Chinese Kale", "image": "https://cdncboard.azureedge.net/cblob/_1790908674_0361109c3372_gemini_generated_image_jw07pjw07pjw07pj.jpg", "backgroundColor": "#fff176" },
+      { "id": "2yf0bn2zN", "label": "津菜 Tientsin cabbage", "image": "https://cdncboard.azureedge.net/cblob/_1790908270_0361109c3372_gemini_generated_image_yrl3vhyrl3vhyrl3.jpg", "backgroundColor": "#fff176" },
+      { "id": "3u2czkgOa", "label": "娃娃菜 Mini Tientsin Cabbage", "image": "https://cdncboard.azureedge.net/cblob/_1790911433_1d943a49a0d1_gemini_generated_image_61uop861uop861uo.jpg", "backgroundColor": "#fff176" },
+      { "id": "VuHt47N4p", "label": "豆苗 Pea Shoot", "image": "https://cdncboard.azureedge.net/cblob/_1790918906_1d943a49a0d1_gemini_generated_image_5gwjpy5gwjpy5gwj.jpg", "backgroundColor": "#fff176" },
+      { "id": "vxKrKJXa2", "label": "茼蒿 Garland chrysanthemum", "image": "https://cdncboard.azureedge.net/cblob/_1790919024_0361109c3372_gemini_generated_image_pjvfuppjvfuppjvf.jpg", "backgroundColor": "#fff176" },
+      { "id": "tLAZfCIrR", "label": "菜心 Flowering Chinese Cabbage", "image": "https://cdncboard.azureedge.net/cblob/_1790919069_1d943a49a0d1_gemini_generated_image_kxzenxkxzenxkxze.jpg", "backgroundColor": "#fff176" },
+      { "id": "eO8UnTZ3O", "label": "椰菜 Cabbage", "image": "https://cdncboard.azureedge.net/cblob/_1790919105_cdfc356103b3_gemini_generated_image_luexmsluexmsluex.jpg", "backgroundColor": "#fff176" },
+      { "id": "8EgO2nGwl", "label": "通菜 Water Spinach", "image": "https://cdncboard.azureedge.net/cblob/_1790920418_cdfc356103b3_gemini_generated_image_2jh3312jh3312jh3.jpg", "backgroundColor": "#fff176" },
+      { "id": "m5LtbLxZQ", "label": "西蘭花 Brocoli", "image": "https://cdncboard.azureedge.net/cblob/_1790920377_0361109c3372_gemini_generated_image_f24t3qf24t3qf24t.jpg", "backgroundColor": "#fff176" },
+      { "id": "2vMp0gWOj", "label": "椰菜花 Cauliflower", "image": "https://cdncboard.azureedge.net/cblob/_1790920231_1d943a49a0d1_gemini_generated_image_skhgjiskhgjiskhg.jpg", "backgroundColor": "#fff176" },
+      { "id": "SdfVPyQ5H", "label": "韭菜 Chinese Chive", "image": "https://cdncboard.azureedge.net/cblob/_1790920441_0361109c3372_gemini_generated_image_1nwdsz1nwdsz1nwd.jpg", "backgroundColor": "#fff176" },
+      { "id": "Iu0zNGwBs", "label": "西生菜 Iceburg lettuce", "image": "https://cdncboard.azureedge.net/cblob/_1790920758_cdfc356103b3_gemini_generated_image_bgi38sbgi38sbgi3.jpg", "backgroundColor": "#fff176" },
+      { "id": "qs9u8xl1B", "label": "韭菜花 Bud chive", "image": "https://cdncboard.azureedge.net/cblob/_1790920780_1d943a49a0d1_gemini_generated_image_e5bbhoe5bbhoe5bb.jpg", "backgroundColor": "#fff176" },
+      { "id": "GrFmXh8rx", "label": "苦瓜 Bitter cucumber", "image": "https://cdncboard.azureedge.net/cblob/_1790930109_1d943a49a0d1_gemini_generated_image_sv75oesv75oesv75.jpg", "backgroundColor": "#fff176" },
+      { "id": "MwxCY2vxj", "label": "青毛豆 Green Soybean", "image": "https://cdncboard.azureedge.net/cblob/_1790920962_1d943a49a0d1_gemini_generated_image_nvpiz7nvpiz7nvpi.jpg", "backgroundColor": "#fff176" },
+      { "id": "6ZpfvFion", "label": "矮瓜 eggplant", "image": "https://cdncboard.azureedge.net/cblob/_1790920985_0361109c3372_gemini_generated_image_7rjvdq7rjvdq7rjv.jpg", "backgroundColor": "#fff176" },
+      { "id": "nqJtipOb8", "label": "青瓜 Cucumber", "image": "https://cdncboard.azureedge.net/cblob/_1790930072_cdfc356103b3_gemini_generated_image_ui4p6xui4p6xui4p.jpg", "backgroundColor": "#fff176" },
+      { "id": "wkNJvYSld", "label": "節瓜 Hairy gourd", "image": "https://cdncboard.azureedge.net/cblob/_1790930150_0361109c3372_gemini_generated_image_8xahru8xahru8xah.jpg", "backgroundColor": "#fff176" },
+      { "id": "C-JQxR6Ng", "label": "甜豆 sweet pea", "image": "https://cdncboard.azureedge.net/cblob/_1790930175_0361109c3372_gemini_generated_image_klev9bklev9bklev.jpg", "backgroundColor": "#fff176" },
+      { "id": "qJYHoymYd", "label": "蘆筍 Asparagus", "image": "https://cdncboard.azureedge.net/cblob/_1790930277_cdfc356103b3_gemini_generated_image_klev9bklev9bklev-2.jpg", "backgroundColor": "#fff176" },
+      { "id": "IWP3AZhJh", "label": "蘿蔔 Radish", "image": "https://cdncboard.azureedge.net/cblob/_1790930319_0361109c3372_gemini_generated_image_4j7xgt4j7xgt4j7x-4.jpg", "backgroundColor": "#fff176" },
+      { "id": "QWLDrI9Pu", "label": "馬鈴薯 potato", "image": "https://cdncboard.azureedge.net/cblob/_1790930336_1d943a49a0d1_gemini_generated_image_4j7xgt4j7xgt4j7x-3.jpg", "backgroundColor": "#fff176" },
+      { "id": "0C_gGxHjY", "label": "蓮藕 Lotus root", "image": "https://cdncboard.azureedge.net/cblob/_1790930376_0361109c3372_gemini_generated_image_4j7xgt4j7xgt4j7x-2.jpg", "backgroundColor": "#fff176" },
+      { "id": "DxyXx3XfM", "label": "韭王 Blanching chive", "image": "https://cdncboard.azureedge.net/cblob/_1790930447_1d943a49a0d1_gemini_generated_image_4j7xgt4j7xgt4j7x.jpg", "backgroundColor": "#fff176" },
+      { "id": "FN5yrNrk8", "label": "蕃茄 Tomato", "image": "https://cdncboard.azureedge.net/cblob/_1790930693_0361109c3372_gemini_generated_image_tnkfbutnkfbutnkf-2.jpg", "backgroundColor": "#fff176" },
+      { "id": "0nRNY84n8", "label": "粟米 Corn", "image": "https://cdncboard.azureedge.net/cblob/_1790930708_1d943a49a0d1_gemini_generated_image_tnkfbutnkfbutnkf.jpg", "backgroundColor": "#fff176" },
+      { "id": "JOeF1hyCo", "label": "唐芹 Chinese Celery", "image": "https://cdncboard.azureedge.net/cblob/_1790931807_0361109c3372_gemini_generated_image_y95a33y95a33y95a.jpg", "backgroundColor": "#fff176" },
+      { "id": "ijFCd3ubC", "label": "白菜 Chinese White Cabbage", "image": "https://cdncboard.azureedge.net/cblob/_1790931868_cdfc356103b3_gemini_generated_image_y95a33y95a33y95a-2.jpg", "backgroundColor": "#fff176" },
+      { "id": "vV1CccCpx", "label": "芥菜 Mustard leaf", "image": "https://cdncboard.azureedge.net/cblob/_1790931894_1d943a49a0d1_gemini_generated_image_y95a33y95a33y95a-3.jpg", "backgroundColor": "#fff176" },
+      { "id": "--19x9TsJ", "label": "枸杞 Matrimony vine", "image": "https://cdncboard.azureedge.net/cblob/_1790931996_cdfc356103b3_gemini_generated_image_y95a33y95a33y95a-4.jpg", "backgroundColor": "#fff176" },
+      { "id": "z45VQQAbq", "label": "小棠菜 Green Chinese Cabbage", "image": "https://cdncboard.azureedge.net/cblob/_1790932037_cdfc356103b3_gemini_generated_image_y95a33y95a33y95a-5.jpg", "backgroundColor": "#fff176" },
+      { "id": "Pix6XmgOV", "label": "油麥菜 Indian lettuce", "image": "https://cdncboard.azureedge.net/cblob/_1790932077_0361109c3372_gemini_generated_image_y95a33y95a33y95a-6.jpg", "backgroundColor": "#fff176" },
+      { "id": "cTXYnhnRA", "label": "皇帝菜 emperor vegetable", "image": "https://cdncboard.azureedge.net/cblob/_1790932104_1d943a49a0d1_gemini_generated_image_y95a33y95a33y95a-7.jpg", "backgroundColor": "#fff176" },
+      { "id": "bzl3aK920", "label": "莧菜 Chinese spinach", "image": "https://cdncboard.azureedge.net/cblob/_1790932178_0361109c3372_gemini_generated_image_y95a33y95a33y95a-8.jpg", "backgroundColor": "#fff176" },
+      { "id": "uY8lB4acf", "label": "馬莧菜 Wild amaranth", "image": "https://cdncboard.azureedge.net/cblob/_1790932213_0361109c3372_gemini_generated_image_y95a33y95a33y95a-9.jpg", "backgroundColor": "#fff176" },
+      { "id": "oNWcSMEG9", "label": "唐生菜 Chinese lettuce", "image": "https://cdncboard.azureedge.net/cblob/_1790932235_0361109c3372_gemini_generated_image_y95a33y95a33y95a-10.jpg", "backgroundColor": "#fff176" },
+      { "id": "GhfEkP92m", "label": "菠菜 spinach", "image": "https://cdncboard.azureedge.net/cblob/_1790933026_1d943a49a0d1_gemini_generated_image_w8sizlw8sizlw8si.jpg", "backgroundColor": "#fff176" },
+      { "id": "xCgWqQUos", "label": "冬瓜 Wax gourd", "image": "https://cdncboard.azureedge.net/cblob/_1790933071_cdfc356103b3_gemini_generated_image_w8sizlw8sizlw8si-2.jpg", "backgroundColor": "#fff176" },
+      { "id": "fwV11cpPl", "label": "佛手瓜 Chayote", "image": "https://cdncboard.azureedge.net/cblob/_1790933157_1d943a49a0d1_gemini_generated_image_w8sizlw8sizlw8si-3.jpg", "backgroundColor": "#fff176" },
+      { "id": "lg7ySlc_U", "label": "豌豆 Garden pea", "image": "https://cdncboard.azureedge.net/cblob/_1790933181_0361109c3372_gemini_generated_image_w8sizlw8sizlw8si-4.jpg", "backgroundColor": "#fff176" },
+      { "id": "qjpsAUhsL", "label": "絲瓜 angled luffa", "image": "https://cdncboard.azureedge.net/cblob/_1790933199_0361109c3372_gemini_generated_image_w8sizlw8sizlw8si-5.jpg", "backgroundColor": "#fff176" },
+      { "id": "UCj1i99Fh", "label": "豆角 Yard-long bean", "image": "https://cdncboard.azureedge.net/cblob/_1790933658_0361109c3372_gemini_generated_image_74o8xa74o8xa74o8.jpg", "backgroundColor": "#fff176" },
+      { "id": "MjqfhIgXW", "label": "翠玉瓜 Zucchini", "image": "https://cdncboard.azureedge.net/cblob/_1790933773_1d943a49a0d1_gemini_generated_image_hijceghijceghijc.jpg", "backgroundColor": "#fff176" },
+      { "id": "p60PGeTrC", "label": "四季豆 snap bean", "image": "https://cdncboard.azureedge.net/cblob/_1790933879_1d943a49a0d1_gemini_generated_image_wj5tu9wj5tu9wj5t.jpg", "backgroundColor": "#fff176" },
+      { "id": "mVn93QGsel", "label": "雞蛋 Egg", "image": "https://cdncboard.azureedge.net/cblob/_1791120624_cdfc356103b3_generated_image-61.png", "backgroundColor": "#fff176" },
+      { "id": "D6R6qMOM0", "label": "燈籠椒 Sweet pepper", "image": "https://cdncboard.azureedge.net/cblob/_1790934838_cdfc356103b3_gemini_generated_image_bfgup8bfgup8bfgu-5.jpg", "backgroundColor": "#fff176" },
+      { "id": "-3r18JOii", "label": "豆腐 Tofu", "image": "https://cdncboard.azureedge.net/cblob/_1791120616_cdfc356103b3_generated_image-60.png", "backgroundColor": "#fff176" }
+    ]
+  },
+  {
+    "id": "6ac25c37a6bb41b8736618e0",
+    "name": "菇類",
+    "tiles": [
+      { "id": "DFVhCBPXq", "label": "鮮冬菇 Fresh Shiitake mushroom", "image": "https://cdncboard.azureedge.net/cblob/_1791122543_cdfc356103b3_gemini_generated_image_zh528nzh528nzh52.jpg", "backgroundColor": "#fff176" },
+      { "id": "ZNFQW3KgQ", "label": "蘑菇 Button mushroom", "image": "https://cdncboard.azureedge.net/cblob/_1791122563_0361109c3372_gemini_generated_image_w8sizlw8sizlw8si-9.jpg", "backgroundColor": "#fff176" },
+      { "id": "DTLWu4rz8", "label": "秀珍菇 Small oyster mushroom", "image": "https://cdncboard.azureedge.net/cblob/_1791122595_1d943a49a0d1_gemini_generated_image_bfgup8bfgup8bfgu.jpg", "backgroundColor": "#fff176" },
+      { "id": "VVMC9CofA", "label": "鮑魚菇 Abalone mushroom", "image": "https://cdncboard.azureedge.net/cblob/_1791122619_1d943a49a0d1_gemini_generated_image_7g2gqp7g2gqp7g2g.jpg", "backgroundColor": "#fff176" },
+      { "id": "lM2Rh7Tqy", "label": "金菇 Needle mushroom", "image": "https://cdncboard.azureedge.net/cblob/_1791122648_1d943a49a0d1_gemini_generated_image_bfgup8bfgup8bfgu-2.jpg", "backgroundColor": "#fff176" },
+      { "id": "v_ASmFL6S", "label": "雞腿菇 Shaggy mane", "image": "https://cdncboard.azureedge.net/cblob/_1791122673_1d943a49a0d1_gemini_generated_image_bfgup8bfgup8bfgu-3.jpg", "backgroundColor": "#fff176" },
+      { "id": "c0hUWjKlJ", "label": "草菇 Straw mushroom", "image": "https://cdncboard.azureedge.net/cblob/_1791122697_1d943a49a0d1_gemini_generated_image_bfgup8bfgup8bfgu-4.jpg", "backgroundColor": "#fff176" }
+    ]
+  },
+  {
+    "id": "6ac22772e9b569f4dc242523",
+    "name": "肉類",
+    "tiles": [
+      { "id": "cHpYuynVk", "label": "豬肉 Pork", "image": "https://cdncboard.azureedge.net/cblob/_1791116616_cdfc356103b3_generated_image-40.png", "backgroundColor": "#fff176" },
+      { "id": "uumzwXTie", "label": "豬扒 Pork chop", "image": "https://cdncboard.azureedge.net/cblob/_1791109881_cdfc356103b3_generated_image-23.png", "backgroundColor": "#fff176" },
+      { "id": "7rpSg4N4x", "label": "腩排 Pork loinrib", "image": "https://cdncboard.azureedge.net/cblob/_1791109900_0361109c3372_generated_image-24.png", "backgroundColor": "#fff176" },
+      { "id": "oclb32QDh", "label": "免治豬肉 Minced pork", "image": "https://cdncboard.azureedge.net/cblob/_1791109920_cdfc356103b3_generated_image-25.png", "backgroundColor": "#fff176" },
+      { "id": "fFlKLtEAl", "label": "豬柳 Pork tenderloin", "image": "https://cdncboard.azureedge.net/cblob/_1791109936_1d943a49a0d1_generated_image-26.png", "backgroundColor": "#fff176" },
+      { "id": "uweiV7P-T", "label": "豬腩肉 Pork belly", "image": "https://cdncboard.azureedge.net/cblob/_1791109963_cdfc356103b3_generated_image-28.png", "backgroundColor": "#fff176" },
+      { "id": "wBZcBZCq2", "label": "梅頭 Pork collar butt", "image": "https://cdncboard.azureedge.net/cblob/_1791111890_cdfc356103b3_generated_image-29.png", "backgroundColor": "#fff176" },
+      { "id": "pS2HQxglA", "label": "排骨 Pork sparerib", "image": "https://cdncboard.azureedge.net/cblob/_1791109944_0361109c3372_generated_image-27.png", "backgroundColor": "#fff176" },
+      { "id": "7Byp3JZ8G", "label": "豬𦟌 Pork shin", "image": "https://cdncboard.azureedge.net/cblob/_1791116699_0361109c3372_generated_image-42.png", "backgroundColor": "#fff176" },
+      { "id": "EVuKXCmNI", "label": "豬肋骨 Pork Lib", "image": "https://cdncboard.azureedge.net/cblob/_1791116811_0361109c3372_generated_image-47.png", "backgroundColor": "#fff176" },
+      { "id": "laAQUaT3L", "label": "豬軟骨 Pork cartilage", "image": "https://cdncboard.azureedge.net/cblob/_1791116851_1d943a49a0d1_gemini_generated_image_21v2ir21v2ir21v2.jpg", "backgroundColor": "#fff176" },
+      { "id": "yMIdFsgEj", "label": "豬踭 Pork shoulder", "image": "https://cdncboard.azureedge.net/cblob/_1791116759_cdfc356103b3_generated_image-44.png", "backgroundColor": "#fff176" },
+      { "id": "LMiWqx-Sr", "label": "豬頸肉 Pork cheek", "image": "https://cdncboard.azureedge.net/cblob/_1791116783_cdfc356103b3_generated_image-45.png", "backgroundColor": "#fff176" },
+      { "id": "PUh2g2sHZ", "label": "豬手 Pig hock", "image": "https://cdncboard.azureedge.net/cblob/_1791116831_1d943a49a0d1_gemini_generated_image_qy0l0rqy0l0rqy0l.jpg", "backgroundColor": "#fff176" },
+      { "id": "s8urdFB8E", "label": "瘦肉 Lean Pork", "image": "https://cdncboard.azureedge.net/cblob/_1791116795_cdfc356103b3_generated_image-46.png", "backgroundColor": "#fff176" }
+    ]
+  },
+  {
+    "id": "6ac25d97e9b569f4dc244fc0",
+    "name": "牛類",
+    "tiles": [
+      { "id": "FhQsL15qm", "label": "牛肉 Beef", "image": "https://cdncboard.azureedge.net/cblob/_1791122886_0361109c3372_generated_image-41.png", "backgroundColor": "#fff176" },
+      { "id": "DfqCIDlXE", "label": "牛尾 Ox tail", "image": "https://cdncboard.azureedge.net/cblob/_1791122910_0361109c3372_generated_image-30.png", "backgroundColor": "#fff176" },
+      { "id": "OcIHC76pp", "label": "牛扒 Beef Steak", "image": "https://cdncboard.azureedge.net/cblob/_1791122932_1d943a49a0d1_generated_image-31.png", "backgroundColor": "#fff176" },
+      { "id": "xuzFJTrhf", "label": "牛𦟌 Beef Shin", "image": "https://cdncboard.azureedge.net/cblob/_1791122969_cdfc356103b3_generated_image-33.png", "backgroundColor": "#fff176" },
+      { "id": "6kJs6nhPi", "label": "肥牛肉 Marble beef", "image": "https://cdncboard.azureedge.net/cblob/_1791123028_0361109c3372_gemini_generated_image_xa2l64xa2l64xa2l.jpg", "backgroundColor": "#fff176" },
+      { "id": "3XU9tc1l7", "label": "牛腩 Beef flank", "image": "https://cdncboard.azureedge.net/cblob/_1791123066_0361109c3372_gemini_generated_image_o59upro59upro59u.jpg", "backgroundColor": "#fff176" },
+      { "id": "r-9Lhlfpq", "label": "牛仔骨 Veal rib", "image": "https://cdncboard.azureedge.net/cblob/_1791123098_0361109c3372_gemini_generated_image_k3jddmk3jddmk3jd.jpg", "backgroundColor": "#fff176" }
+    ]
+  },
+  {
+    "id": "6ac26203a6bb41b873661ec5",
+    "name": "雞",
+    "tiles": [
+      { "id": "jW_blTITb", "label": "雞扒 Chicken steak", "image": "https://cdncboard.azureedge.net/cblob/_1791124026_1d943a49a0d1_generated_image-36.png", "backgroundColor": "#fff176" },
+      { "id": "bKgj3qzKy", "label": "雞腿 Chicken leg", "image": "https://cdncboard.azureedge.net/cblob/_1791124048_0361109c3372_generated_image-37.png", "backgroundColor": "#fff176" },
+      { "id": "ajgQ6lqHw0", "label": "雞鎚 Drumstick", "image": "https://cdncboard.azureedge.net/cblob/_1791124063_1d943a49a0d1_generated_image-38.png", "backgroundColor": "#fff176" },
+      { "id": "Nx3EBR7yO", "label": "雞翼 Chicken wing", "image": "https://cdncboard.azureedge.net/cblob/_1791124096_1d943a49a0d1_generated_image-39.png", "backgroundColor": "#fff176" }
+    ]
+  },
+  {
+    "id": "6ac25eba9707f685afb8daeb",
+    "name": "羊",
+    "tiles": [
+      { "id": "jkxZZMN0k", "label": "羊肉 Mutton", "image": "https://cdncboard.azureedge.net/cblob/_1791123154_0361109c3372_generated_image-32.png", "backgroundColor": "#fff176" },
+      { "id": "FkRxTrXbu", "label": "羊扒 Mutton rack", "image": "https://cdncboard.azureedge.net/cblob/_1791123193_0361109c3372_generated_image-34.png", "backgroundColor": "#fff176" },
+      { "id": "3cd0A--9Q", "label": "羊腩 Mutton flank", "image": "https://cdncboard.azureedge.net/cblob/_1791123179_cdfc356103b3_gemini_generated_image_7gyj2b7gyj2b7gyj.jpg", "backgroundColor": "#fff176" }
+    ]
+  },
+  {
+    "id": "6ac22843e9b569f4dc2425bb",
+    "name": "海鮮與魚類",
+    "tiles": [
+      { "id": "88DT2WHz1", "label": "木棉 Bigeye", "image": "https://cdncboard.azureedge.net/cblob/_1791109366_cdfc356103b3_generated_image-2.png", "backgroundColor": "#fff176" },
+      { "id": "bIRM6xuJ_", "label": "紅衫 Golden thread", "image": "https://cdncboard.azureedge.net/cblob/_1791109387_1d943a49a0d1_generated_image-6.png", "backgroundColor": "#fff176" },
+      { "id": "j4c_4wBhbt", "label": "桂花魚 Mandarin fish", "image": "https://cdncboard.azureedge.net/cblob/_1791109408_1d943a49a0d1_generated_image-7.png", "backgroundColor": "#fff176" },
+      { "id": "Yi1yfl8cm", "label": "烏頭 Grey mullet", "image": "https://cdncboard.azureedge.net/cblob/_1791109431_0361109c3372_generated_image-8.png", "backgroundColor": "#fff176" },
+      { "id": "Ky9ECihI8", "label": "黃花魚 Yellow croaker", "image": "https://cdncboard.azureedge.net/cblob/_1791109445_0361109c3372_generated_image-9.png", "backgroundColor": "#fff176" },
+      { "id": "Ey31Ez9z8", "label": "鯇魚 Grass carp", "image": "https://cdncboard.azureedge.net/cblob/_1791109481_0361109c3372_generated_image-5.png", "backgroundColor": "#fff176" },
+      { "id": "jjieNG9hJ", "label": "花蝦 Striped prawn", "image": "https://cdncboard.azureedge.net/cblob/_1791109498_cdfc356103b3_generated_image.png", "backgroundColor": "#fff176" },
+      { "id": "7BKZgELhS", "label": "白飯魚 Noodlefish", "image": "https://cdncboard.azureedge.net/cblob/_1791109519_0361109c3372_generated_image-10.png", "backgroundColor": "#fff176" },
+      { "id": "MiB30jESd", "label": "白鱔 Japanese eel", "image": "https://cdncboard.azureedge.net/cblob/_1791109549_cdfc356103b3_generated_image-11.png", "backgroundColor": "#fff176" },
+      { "id": "CK2P0a9hA", "label": "老虎斑 Brown-marbled grouper", "image": "https://cdncboard.azureedge.net/cblob/_1791109582_0361109c3372_generated_image-12.png", "backgroundColor": "#fff176" },
+      { "id": "Jk_9JV8Ez", "label": "衫斑 Camouflage grouper", "image": "https://cdncboard.azureedge.net/cblob/_1791109611_cdfc356103b3_generated_image-22.png", "backgroundColor": "#fff176" },
+      { "id": "oERQQGj2k", "label": "䱽魚 Pomfret", "image": "https://cdncboard.azureedge.net/cblob/_1791109633_0361109c3372_generated_image-13.png", "backgroundColor": "#fff176" },
+      { "id": "rjWnZ9bMJ", "label": "撻沙 Tonguesole", "image": "https://cdncboard.azureedge.net/cblob/_1791109709_1d943a49a0d1_generated_image-14.png", "backgroundColor": "#fff176" },
+      { "id": "jEI6kN7tf", "label": "絞鯪魚肉 Minced mud carp", "image": "https://cdncboard.azureedge.net/cblob/_1791109757_1d943a49a0d1_generated_image-15.png", "backgroundColor": "#fff176" },
+      { "id": "9IvfI9QOd", "label": "紅蟹 Red crab", "image": "https://cdncboard.azureedge.net/cblob/_1791109770_cdfc356103b3_generated_image-16.png", "backgroundColor": "#fff176" },
+      { "id": "LhLw-ViB6", "label": "三點蟹 Three-spotted crab", "image": "https://cdncboard.azureedge.net/cblob/_1791109782_0361109c3372_generated_image-17.png", "backgroundColor": "#fff176" },
+      { "id": "B31y4u9J7", "label": "花蟹 Flower crab", "image": "https://cdncboard.azureedge.net/cblob/_1791109820_cdfc356103b3_generated_image-20.png", "backgroundColor": "#fff176" },
+      { "id": "b3u3a1FKdy", "label": "瀨尿蝦 Mantis shrimp", "image": "https://cdncboard.azureedge.net/cblob/_1791109808_cdfc356103b3_generated_image-19.png", "backgroundColor": "#fff176" },
+      { "id": "A5dhWLNWp", "label": "基圍蝦 Greasyback shrimp", "image": "https://cdncboard.azureedge.net/cblob/_1791109829_0361109c3372_generated_image-21.png", "backgroundColor": "#fff176" },
+      { "id": "6Exq6zwPwX", "label": "龍蝦 Lobster", "image": "https://cdncboard.azureedge.net/cblob/_1791109792_1d943a49a0d1_generated_image-18.png", "backgroundColor": "#fff176" }
+    ]
+  },
+  {
+    "id": "6ac24964e9b569f4dc243e5a",
+    "name": "燒味",
+    "tiles": [
+      { "id": "_1xT-LSwY", "label": "叉燒 Barbecued pork", "image": "https://cdncboard.azureedge.net/cblob/_1791118405_0361109c3372_gemini_generated_image_fqbwxofqbwxofqbw.jpg", "backgroundColor": "#fff176" },
+      { "id": "feiW3fkeF", "label": "燒肉 Roasted pork", "image": "https://cdncboard.azureedge.net/cblob/_1791118474_1d943a49a0d1_gemini_generated_image_7ifkjh7ifkjh7ifk.jpg", "backgroundColor": "#fff176" },
+      { "id": "Ec-78f3Jq", "label": "燒鵝 Roasted goose", "image": "https://cdncboard.azureedge.net/cblob/_1791118518_0361109c3372_gemini_generated_image_g450swg450swg450.jpg", "backgroundColor": "#fff176" },
+      { "id": "KoqqUF9JU", "label": "白切雞 Poached Chicken", "image": "https://cdncboard.azureedge.net/cblob/_1791118568_cdfc356103b3_gemini_generated_image_ukjtdukjtdukjtdu.jpg", "backgroundColor": "#fff176" },
+      { "id": "_AueV07i2", "label": "燒乳豬 Roasted suckling pig", "image": "https://cdncboard.azureedge.net/cblob/_1791118657_cdfc356103b3_gemini_generated_image_sqkhnxsqkhnxsqkh.jpg", "backgroundColor": "#fff176" },
+      { "id": "rb5Jodjih", "label": "滷水雞翼 Marinated chicken wing", "image": "https://cdncboard.azureedge.net/cblob/_1791118813_cdfc356103b3_gemini_generated_image_pi4rlipi4rlipi4r.jpg", "backgroundColor": "#fff176" },
+      { "id": "POf3kRHCr", "label": "燒乳鴿 Roasted pigeon", "image": "https://cdncboard.azureedge.net/cblob/_1791118773_1d943a49a0d1_gemini_generated_image_smzcajsmzcajsmzc.jpg", "backgroundColor": "#fff176" },
+      { "id": "JV2K3tGPA", "label": "滷水鵝 Marinated goose", "image": "https://cdncboard.azureedge.net/cblob/_1791118739_cdfc356103b3_gemini_generated_image_8lu8s8lu8s8lu8s8.jpg", "backgroundColor": "#fff176" }
+    ]
+  },
+  {
+    "id": "6ac24888e9b569f4dc243cec",
+    "name": "生果",
+    "tiles": [
+      { "id": "bTSaNUVqU", "label": "士多啤梨 Strawberry", "image": "https://cdncboard.azureedge.net/cblob/_1791117471_cdfc356103b3_gemini_generated_image_w3snfhw3snfhw3sn-9.jpg", "backgroundColor": "#fff176" },
+      { "id": "ABmLudH4y", "label": "奇異果 Kiwi", "image": "https://cdncboard.azureedge.net/cblob/_1791117493_cdfc356103b3_gemini_generated_image_w3snfhw3snfhw3sn-8.jpg", "backgroundColor": "#fff176" },
+      { "id": "WwwdcIupi", "label": "青蘋果 Green Apple", "image": "https://cdncboard.azureedge.net/cblob/_1791117516_1d943a49a0d1_gemini_generated_image_w3snfhw3snfhw3sn-7.jpg", "backgroundColor": "#fff176" },
+      { "id": "zGtSCB4Te", "label": "芒果 Mango", "image": "https://cdncboard.azureedge.net/cblob/_1791117529_1d943a49a0d1_gemini_generated_image_w3snfhw3snfhw3sn-6.jpg", "backgroundColor": "#fff176" },
+      { "id": "wolMQq-Ny", "label": "紅桑子 Rasberry", "image": "https://cdncboard.azureedge.net/cblob/_1791117547_0361109c3372_gemini_generated_image_w3snfhw3snfhw3sn-5.jpg", "backgroundColor": "#fff176" },
+      { "id": "DYkqgc4df", "label": "提子 Grape", "image": "https://cdncboard.azureedge.net/cblob/_1791117558_1d943a49a0d1_gemini_generated_image_w3snfhw3snfhw3sn-4.jpg", "backgroundColor": "#fff176" },
+      { "id": "rmTtSD1Fy", "label": "桃 Peach", "image": "https://cdncboard.azureedge.net/cblob/_1791117571_cdfc356103b3_gemini_generated_image_w3snfhw3snfhw3sn-3.jpg", "backgroundColor": "#fff176" },
+      { "id": "8Y0rH92pe", "label": "香蕉 Banana", "image": "https://cdncboard.azureedge.net/cblob/_1791117586_0361109c3372_gemini_generated_image_w3snfhw3snfhw3sn-2.jpg", "backgroundColor": "#fff176" },
+      { "id": "nSHQwArAVT", "label": "黑莓 Blackberry", "image": "https://cdncboard.azureedge.net/cblob/_1791117598_cdfc356103b3_gemini_generated_image_w3snfhw3snfhw3sn.jpg", "backgroundColor": "#fff176" }
+    ]
+  },
+  {
+    "id": "6ac24de9e9b569f4dc244215",
+    "name": "冷凍食品",
+    "tiles": [
+      { "id": "ISiMvjErE", "label": "蟹柳 Imitation crab meat", "image": "https://cdncboard.azureedge.net/cblob/_1791119686_0361109c3372_generated_image-48.png", "backgroundColor": "#fff176" },
+      { "id": "Y1gqenAIj", "label": "墨魚丸 cuttlefish ball", "image": "https://cdncboard.azureedge.net/cblob/_1791119819_cdfc356103b3_generated_image-49.png", "backgroundColor": "#fff176" },
+      { "id": "BhNu_Nmek", "label": "火腿 ham", "image": "https://cdncboard.azureedge.net/cblob/_1791119831_cdfc356103b3_generated_image-50.png", "backgroundColor": "#fff176" },
+      { "id": "4HTQ4AIMB", "label": "蝦丸 Shrimp ball", "image": "https://cdncboard.azureedge.net/cblob/_1791119845_cdfc356103b3_generated_image-51.png", "backgroundColor": "#fff176" },
+      { "id": "iRJZTDRlS", "label": "豬肉丸 Pork ball", "image": "https://cdncboard.azureedge.net/cblob/_1791120018_1d943a49a0d1_generated_image-52.png", "backgroundColor": "#fff176" },
+      { "id": "0e5YCKUOj", "label": "龍蝦丸 lobster ball", "image": "https://cdncboard.azureedge.net/cblob/_1791120033_1d943a49a0d1_generated_image-53.png", "backgroundColor": "#fff176" },
+      { "id": "OJd_Rgyxt", "label": "銀鱈魚 Black cod", "image": "https://cdncboard.azureedge.net/cblob/_1791120056_1d943a49a0d1_generated_image-54.png", "backgroundColor": "#fff176" },
+      { "id": "xescnWtoK", "label": "牛丸 beef ball", "image": "https://cdncboard.azureedge.net/cblob/_1791120069_cdfc356103b3_img_1793__58450_zoom.jpg", "backgroundColor": "#fff176" },
+      { "id": "5A7eRMt2K", "label": "魚皮餃 fish skin dumpling", "image": "https://cdncboard.azureedge.net/cblob/_1791120084_1d943a49a0d1_generated_image-55.png", "backgroundColor": "#fff176" },
+      { "id": "oF5BAcbxPB", "label": "三文魚 salmon", "image": "https://cdncboard.azureedge.net/cblob/_1791120094_1d943a49a0d1_generated_image-56.png", "backgroundColor": "#fff176" },
+      { "id": "ox1F_y7d7", "label": "魚丸 fish ball", "image": "https://cdncboard.azureedge.net/cblob/_1791120109_cdfc356103b3_images-2.jpeg", "backgroundColor": "#fff176" },
+      { "id": "FflG0C6tG", "label": "雞肉腸 Chicken sausage", "image": "https://cdncboard.azureedge.net/cblob/_1791120126_1d943a49a0d1_generated_image-57.png", "backgroundColor": "#fff176" },
+      { "id": "lXQfMkr6C", "label": "脆皮腸 Crispy sausage", "image": "https://cdncboard.azureedge.net/cblob/_1791120139_1d943a49a0d1_generated_image-58.png", "backgroundColor": "#fff176" }
+    ]
+  }
+];
+
+let boards = structuredClone(INITIAL_BOARDS);
+let currentBoardId = boards.find(b => b.isRoot)?.id || boards[0].id;
+let rootBoardId = currentBoardId;
+let navStack = [currentBoardId];
+let sentence = [];
+let editorMode = false;
+let draggedTileId = null;
+let dragSourceBoardId = null;
+
+const $ = id => document.getElementById(id);
+
+function uid(prefix="id") {
+  return prefix + "_" + Math.random().toString(36).slice(2, 10) + Date.now().toString(36).slice(-4);
+}
+
+function currentBoard() {
+  return boards.find(b => b.id === currentBoardId) || boards[0];
+}
+
+function getBoard(id) {
+  return boards.find(b => b.id === id);
+}
+
+function parseLabel(label) {
+  const parts = (label || "").trim().split(/\s+/);
+  const zhParts = [];
+  const enParts = [];
+  let englishStarted = false;
+  for (const p of parts) {
+    if (/^[A-Za-z0-9.,'’()\-]+$/.test(p)) englishStarted = true;
+    if (englishStarted) enParts.push(p);
+    else zhParts.push(p);
+  }
+  return {
+    zh: zhParts.join(" ") || label || "",
+    en: enParts.join(" ") || label || ""
+  };
+}
+
+function buildLabel(zh, en) {
+  return [zh.trim(), en.trim()].filter(Boolean).join(" ");
+}
+
+function normalizeTile(tile) {
+  if (!tile.type) tile.type = "button";
+  return tile;
+}
+
+function render() {
+  const board = currentBoard();
+  $("boardNameInput").value = board.name || "";
+  renderGrid();
+  renderBreadcrumbs();
+  renderSentence();
+  renderEditorLists();
+}
+
+function createImageHtml(url, alt, type) {
+  if (!url) {
+    return `<span style="font-size:32px;color:#94a3b8;">${type === "folder" ? "📁" : "💬"}</span>`;
+  }
+
+  return `
+    <img
+      src="${escapeHtml(url)}"
+      alt="${escapeHtml(alt || "")}"
+      loading="lazy"
+      referrerpolicy="no-referrer"
+      crossorigin="anonymous"
+      onerror="this.style.display='none'; const fb=this.parentElement.querySelector('.aac-image-fallback'); if(fb){fb.style.display='block';}"
+    >
+    <div class="aac-image-fallback">圖片未能載入<br/>Image unavailable</div>
+  `;
+}
+
+function renderGrid() {
+  const grid = $("boardGrid");
+  const cols = $("gridSelect").value;
+  grid.className = "grid cols-" + cols;
+  grid.innerHTML = "";
+
+  const tiles = currentBoard().tiles || [];
+  tiles.forEach((rawTile) => {
+    const tile = normalizeTile(rawTile);
+    const label = parseLabel(tile.label);
+    const card = document.createElement("div");
+    card.className = "aac-card";
+    card.style.backgroundColor = tile.backgroundColor || (tile.type === "folder" ? "#bbdefb" : "#fff176");
+    card.dataset.id = tile.id;
+    card.draggable = editorMode;
+    card.setAttribute("role", "button");
+    card.setAttribute("tabindex", "0");
+    card.setAttribute("aria-label", tile.label || "");
+    card.innerHTML = `
+      ${tile.type === "folder" ? `<div class="folder-pill">📂 分類</div>` : ""}
+      ${editorMode ? `
+        <div class="card-edit-actions">
+          <button title="編輯" data-action="edit">✎</button>
+          <button title="複製" data-action="copy">⧉</button>
+          <button title="刪除" data-action="delete">🗑</button>
+        </div>` : ""}
+      <div class="aac-image-box">
+        ${createImageHtml(tile.image, tile.label, tile.type)}
+      </div>
+      <div class="aac-label-box">
+        <div class="zh-label">${escapeHtml(label.zh)}</div>
+        <div class="en-label">${escapeHtml(label.en)}</div>
+      </div>
+    `;
+
+    card.addEventListener("click", (e) => {
+      const action = e.target?.dataset?.action;
+      if (action) {
+        e.stopPropagation();
+        if (action === "edit") openItemModal(tile.id);
+        if (action === "copy") copyTile(tile.id);
+        if (action === "delete") deleteTile(tile.id);
+        return;
+      }
+
+      if (editorMode) {
+        openItemModal(tile.id);
+        return;
+      }
+
+      handleTilePress(tile);
+    });
+
+    card.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        if (editorMode) openItemModal(tile.id);
+        else handleTilePress(tile);
+      }
+    });
+
+    card.addEventListener("dragstart", (e) => {
+      draggedTileId = tile.id;
+      dragSourceBoardId = currentBoardId;
+      card.classList.add("dragging");
+      e.dataTransfer.effectAllowed = "move";
+      e.dataTransfer.setData("text/plain", tile.id);
+    });
+
+    card.addEventListener("dragend", () => {
+      card.classList.remove("dragging");
+      document.querySelectorAll(".drag-over").forEach(el => el.classList.remove("drag-over"));
+      draggedTileId = null;
+      dragSourceBoardId = null;
+    });
+
+    card.addEventListener("dragover", (e) => {
+      if (!editorMode || !draggedTileId || draggedTileId === tile.id) return;
+      e.preventDefault();
+      card.classList.add("drag-over");
+    });
+
+    card.addEventListener("dragleave", () => card.classList.remove("drag-over"));
+
+    card.addEventListener("drop", (e) => {
+      if (!editorMode || !draggedTileId || draggedTileId === tile.id) return;
+      e.preventDefault();
+      card.classList.remove("drag-over");
+
+      const sourceBoard = getBoard(dragSourceBoardId);
+      const draggedIndex = sourceBoard.tiles.findIndex(t => t.id === draggedTileId);
+      if (draggedIndex < 0) return;
+      const [draggedTile] = sourceBoard.tiles.splice(draggedIndex, 1);
+
+      if (tile.type === "folder" && tile.loadBoard && draggedTile.id !== tile.id) {
+        const targetBoard = getBoard(tile.loadBoard);
+        if (targetBoard) {
+          targetBoard.tiles.push(draggedTile);
+          toast("已移入資料夾 / Moved into folder");
+        } else {
+          sourceBoard.tiles.splice(draggedIndex, 0, draggedTile);
+          toast("找不到目標資料夾頁面");
+        }
+      } else {
+        const targetBoard = currentBoard();
+        const targetIndex = targetBoard.tiles.findIndex(t => t.id === tile.id);
+        targetBoard.tiles.splice(targetIndex, 0, draggedTile);
+        toast("已重新排序 / Reordered");
+      }
+      render();
+    });
+
+    grid.appendChild(card);
+  });
+
+  $("editorHint").style.display = editorMode ? "block" : "none";
+}
+
+function renderBreadcrumbs() {
+  const crumbs = $("breadcrumbs");
+  crumbs.innerHTML = "";
+  navStack.forEach((id, idx) => {
+    const b = getBoard(id);
+    if (!b) return;
+    if (idx > 0) {
+      const sep = document.createElement("span");
+      sep.textContent = "›";
+      crumbs.appendChild(sep);
+    }
+    const btn = document.createElement("button");
+    btn.className = "crumb-btn";
+    btn.innerHTML = idx === 0 ? "🏠 " + escapeHtml(b.name) : escapeHtml(b.name);
+    btn.onclick = () => {
+      navStack = navStack.slice(0, idx + 1);
+      currentBoardId = id;
+      render();
+    };
+    crumbs.appendChild(btn);
+  });
+}
+
+function renderSentence() {
+  const bar = $("sentenceBar");
+  const count = $("sentenceCount");
+  count.textContent = sentence.length;
+  bar.innerHTML = "";
+  if (sentence.length === 0) {
+    const ph = document.createElement("div");
+    ph.className = "sentence-placeholder";
+    ph.textContent = "👆 點擊下方圖片卡以加入句子並發聲 (Tap cards to speak and add to sentence)...";
+    bar.appendChild(ph);
+    return;
+  }
+  sentence.forEach((tile, idx) => {
+    const label = parseLabel(tile.label);
+    const chip = document.createElement("div");
+    chip.className = "sentence-chip";
+    chip.innerHTML = `
+      ${tile.image ? `<img src="${escapeHtml(tile.image)}" alt="" referrerpolicy="no-referrer" crossorigin="anonymous" onerror="this.style.display='none'">` : ""}
+      <span>${escapeHtml(label.zh)}<small>${escapeHtml(label.en)}</small></span>
+    `;
+    chip.onclick = () => {
+      sentence.splice(idx, 1);
+      renderSentence();
+    };
+    bar.appendChild(chip);
+  });
+}
+
+function handleTilePress(tile) {
+  if (tile.type === "folder" && tile.loadBoard) {
+    const target = getBoard(tile.loadBoard);
+    if (target) {
+      currentBoardId = target.id;
+      navStack.push(target.id);
+      render();
+    } else {
+      toast("找不到資料夾頁面 / Folder not found");
+    }
+    return;
+  }
+
+  sentence.push({...tile});
+  renderSentence();
+  speakTile(tile);
+}
+
+function renderEditorLists() {
+  const homeSelect = $("homeSelect");
+  const folderTarget = $("folderTargetInput");
+  const moveTarget = $("moveTargetInput");
+
+  if (!homeSelect || !folderTarget || !moveTarget) return;
+
+  homeSelect.innerHTML = "";
+  folderTarget.innerHTML = "";
+  moveTarget.innerHTML = `<option value="">留在目前頁面 / Stay here</option><option value="root">移到首頁 / Move to home</option>`;
+
+  boards.forEach(b => {
+    const opt = document.createElement("option");
+    opt.value = b.id;
+    opt.textContent = `${b.name}${b.isRoot ? " ★" : ""}`;
+    if (b.id === rootBoardId) opt.selected = true;
+    homeSelect.appendChild(opt);
+
+    const opt2 = document.createElement("option");
+    opt2.value = b.id;
+    opt2.textContent = b.name;
+    folderTarget.appendChild(opt2);
+
+    if (b.id !== currentBoardId) {
+      const opt3 = document.createElement("option");
+      opt3.value = b.id;
+      opt3.textContent = b.name;
+      moveTarget.appendChild(opt3);
+    }
+  });
+
+  const list = $("homeList");
+  list.innerHTML = "";
+  boards.forEach(b => {
+    if (!b.isRoot && b.id !== rootBoardId) return;
+    const row = document.createElement("div");
+    row.className = "home-row";
+    row.innerHTML = `<span>${escapeHtml(b.name)} ${b.id === rootBoardId ? "★" : ""}</span>`;
+    const go = document.createElement("button");
+    go.className = "small-btn";
+    go.textContent = "前往";
+    go.onclick = () => {
+      currentBoardId = b.id;
+      navStack = [b.id];
+      render();
+    };
+    row.appendChild(go);
+    list.appendChild(row);
+  });
+}
+
+function speakTile(tile) {
+  const { zh, en } = parseLabel(tile.label);
+  speakBilingual(zh, en);
+}
+
+function speakSentence() {
+  if (!sentence.length) return;
+  const zh = sentence.map(t => parseLabel(t.label).zh).filter(Boolean).join("，");
+  const en = sentence.map(t => parseLabel(t.label).en).filter(Boolean).join(", ");
+  speakBilingual(zh, en);
+}
+
+function getVoices() {
+  return window.speechSynthesis ? speechSynthesis.getVoices() : [];
+}
+
+function chooseVoice(lang) {
+  const voices = getVoices();
+  if (lang === "zh-HK") {
+    return voices.find(v => /zh[-_]HK/i.test(v.lang)) ||
+           voices.find(v => /Hong Kong|Cantonese|粵|粤/i.test(v.name)) ||
+           voices.find(v => /zh/i.test(v.lang)) ||
+           null;
+  }
+  return voices.find(v => /en[-_]GB/i.test(v.lang)) ||
+         voices.find(v => /en[-_]US/i.test(v.lang)) ||
+         voices.find(v => /^en/i.test(v.lang)) ||
+         null;
+}
+
+function speakText(text, lang) {
+  return new Promise(resolve => {
+    if (!("speechSynthesis" in window) || !text) {
+      resolve();
+      return;
+    }
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = lang;
+    u.rate = clamp(parseFloat($("rateInput").value || "0.72"), 0.4, 1.2);
+    u.pitch = clamp(parseFloat($("pitchInput").value || "0.95"), 0.7, 1.3);
+    u.volume = 1;
+    const voice = chooseVoice(lang);
+    if (voice) u.voice = voice;
+    u.onend = resolve;
+    u.onerror = resolve;
+    speechSynthesis.speak(u);
+  });
+}
+
+async function speakBilingual(zh, en) {
+  if (!("speechSynthesis" in window)) {
+    toast("此瀏覽器不支援語音播放 / Speech not supported");
+    return;
+  }
+  speechSynthesis.cancel();
+  await speakText(zh, "zh-HK");
+  await delay(clamp(parseInt($("pauseInput").value || "650", 10), 100, 2500));
+  await speakText(en, "en-US");
+}
+
+function delay(ms) {
+  return new Promise(res => setTimeout(res, ms));
+}
+
+function clamp(n, min, max) {
+  return Math.max(min, Math.min(max, n));
+}
+
+function escapeHtml(str) {
+  return String(str ?? "").replace(/[&<>"']/g, s => ({
+    "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;"
+  }[s]));
+}
+
+function toast(msg) {
+  const t = $("toast");
+  t.textContent = msg;
+  t.classList.add("show");
+  clearTimeout(toast.timer);
+  toast.timer = setTimeout(() => t.classList.remove("show"), 1800);
+}
+
+function openEditor(open=true) {
+  editorMode = open;
+  $("editorFloating").classList.toggle("open", open);
+  $("editorToggle").classList.toggle("active", open);
+  render();
+}
+
+function openItemModal(tileId=null, forceType=null) {
+  const board = currentBoard();
+  const tile = tileId ? board.tiles.find(t => t.id === tileId) : null;
+  const mode = tile ? "edit" : "new";
+  const type = forceType || tile?.type || "button";
+  const label = parseLabel(tile?.label || "");
+
+  $("modalTitle").textContent = mode === "edit" ? "編輯卡片 / Edit Card" : "新增卡片 / New Card";
+  $("editId").value = tile?.id || "";
+  $("editMode").value = mode;
+  $("zhInput").value = label.zh || "";
+  $("enInput").value = label.en || "";
+  $("imageInput").value = tile?.image || "";
+  $("bgInput").value = rgbToHex(tile?.backgroundColor || (type === "folder" ? "#bbdefb" : "#fff176"));
+  $("typeInput").value = type;
+  $("folderTargetWrap").style.display = type === "folder" ? "block" : "none";
+
+  renderEditorLists();
+  if (tile?.loadBoard) $("folderTargetInput").value = tile.loadBoard;
+  $("deleteItemBtn").style.display = mode === "edit" ? "inline-flex" : "none";
+  $("modalBackdrop").classList.add("show");
+  updateImagePreview();
+}
+
+function closeModal() {
+  $("modalBackdrop").classList.remove("show");
+}
+
+function updateImagePreview() {
+  const url = $("imageInput").value.trim();
+  const box = $("imagePreviewBox");
+  const status = $("previewStatus");
+
+  status.className = "preview-status";
+
+  if (!url) {
+    box.innerHTML = `<div class="preview-placeholder">未有圖片預覽<br/>No image preview</div>`;
+    status.textContent = "請貼上圖片網址，系統會即時預覽。";
+    return;
+  }
+
+  box.innerHTML = `<div class="preview-placeholder">圖片載入中...<br/>Loading image...</div>`;
+  status.textContent = "正在嘗試載入圖片...";
+
+  const img = new Image();
+  img.referrerPolicy = "no-referrer";
+  img.crossOrigin = "anonymous";
+  img.onload = () => {
+    box.innerHTML = "";
+    img.alt = "圖片預覽";
+    box.appendChild(img);
+    status.textContent = "圖片可正常預覽 / Image preview loaded";
+    status.className = "preview-status ok";
+  };
+  img.onerror = () => {
+    box.innerHTML = `<div class="preview-placeholder">圖片未能預覽<br/>Image preview failed</div>`;
+    status.textContent = "圖片未能載入。可能是網址錯誤，或圖片網站阻擋外部載入。";
+    status.className = "preview-status bad";
+  };
+  img.src = url;
+}
+
+function saveItem() {
+  const mode = $("editMode").value;
+  const id = $("editId").value;
+  const type = $("typeInput").value;
+  const zh = $("zhInput").value;
+  const en = $("enInput").value;
+  const tile = {
+    id: id || uid("card"),
+    label: buildLabel(zh, en),
+    image: $("imageInput").value.trim(),
+    backgroundColor: $("bgInput").value,
+    type
+  };
+  if (type === "folder") {
+    tile.loadBoard = $("folderTargetInput").value;
+  }
+
+  const board = currentBoard();
+
+  if (mode === "edit") {
+    const idx = board.tiles.findIndex(t => t.id === id);
+    if (idx >= 0) board.tiles[idx] = {...board.tiles[idx], ...tile};
+  } else {
+    if (type === "folder" && !$("folderTargetInput").value) {
+      const newBoard = { id: uid("board"), name: zh || en || "新資料夾", tiles: [] };
+      boards.push(newBoard);
+      tile.loadBoard = newBoard.id;
+    }
+    board.tiles.push(tile);
+  }
+
+  const moveTarget = $("moveTargetInput").value;
+  if (mode === "edit" && moveTarget) {
+    moveTileTo(id, moveTarget === "root" ? rootBoardId : moveTarget);
+  }
+
+  closeModal();
+  render();
+  toast("已儲存 / Saved");
+}
+
+function moveTileTo(tileId, targetBoardId) {
+  let found = null, source = null;
+  for (const b of boards) {
+    const idx = b.tiles.findIndex(t => t.id === tileId);
+    if (idx >= 0) {
+      found = b.tiles.splice(idx, 1)[0];
+      source = b;
+      break;
+    }
+  }
+  if (found) {
+    const target = getBoard(targetBoardId);
+    if (target) target.tiles.push(found);
+    else source.tiles.push(found);
+  }
+}
+
+function deleteTile(tileId) {
+  const board = currentBoard();
+  const idx = board.tiles.findIndex(t => t.id === tileId);
+  if (idx >= 0) {
+    board.tiles.splice(idx, 1);
+    render();
+    toast("已刪除 / Deleted");
+  }
+}
+
+function copyTile(tileId) {
+  const board = currentBoard();
+  const tile = board.tiles.find(t => t.id === tileId);
+  if (!tile) return;
+  const copy = structuredClone(tile);
+  copy.id = uid("copy");
+  copy.label = tile.label;
+  board.tiles.push(copy);
+  render();
+  toast("已複製 / Copied");
+}
+
+function rgbToHex(color) {
+  if (!color) return "#fff176";
+  if (color.startsWith("#")) return color;
+  const nums = color.match(/\d+/g);
+  if (!nums || nums.length < 3) return "#fff176";
+  return "#" + nums.slice(0,3).map(n => Number(n).toString(16).padStart(2, "0")).join("");
+}
+
+function createFolderBoard() {
+  const id = uid("board");
+  const board = { id, name: "新資料夾", tiles: [] };
+  boards.push(board);
+  renderEditorLists();
+  $("folderTargetInput").value = id;
+  return id;
+}
+
+function exportJson() {
+  $("jsonBox").value = JSON.stringify(boards, null, 2);
+  $("advancedEditor").classList.add("open");
+  toast("JSON 已匯出 / Exported");
+}
+
+$("gridSelect").addEventListener("change", renderGrid);
+
+$("homeBtn").onclick = () => {
+  currentBoardId = rootBoardId;
+  navStack = [rootBoardId];
+  render();
+};
+
+$("playSentenceBtn").onclick = speakSentence;
+$("clearSentenceBtn").onclick = () => { sentence = []; renderSentence(); };
+$("backspaceBtn").onclick = () => { sentence.pop(); renderSentence(); };
+
+$("editorToggle").onclick = () => openEditor(!editorMode);
+$("closeEditor").onclick = () => openEditor(false);
+$("advancedToggle").onclick = () => $("advancedEditor").classList.toggle("open");
+
+$("addItemBtn").onclick = () => openItemModal(null, "button");
+$("addFolderBtn").onclick = () => {
+  openItemModal(null, "folder");
+  const newId = createFolderBoard();
+  $("folderTargetInput").value = newId;
+};
+
+$("exportQuickBtn").onclick = exportJson;
+$("exportBtn").onclick = exportJson;
+
+$("typeInput").addEventListener("change", () => {
+  const type = $("typeInput").value;
+  $("folderTargetWrap").style.display = type === "folder" ? "block" : "none";
+  if (type === "folder" && !$("folderTargetInput").value) createFolderBoard();
+});
+
+$("imageInput").addEventListener("input", () => {
+  clearTimeout(window.previewTimer);
+  window.previewTimer = setTimeout(updateImagePreview, 350);
+});
+
+$("refreshPreviewBtn").onclick = updateImagePreview;
+
+$("clearImageBtn").onclick = () => {
+  $("imageInput").value = "";
+  updateImagePreview();
+};
+
+$("saveItemBtn").onclick = saveItem;
+$("modalClose").onclick = closeModal;
+
+$("modalBackdrop").addEventListener("click", e => {
+  if (e.target.id === "modalBackdrop") closeModal();
+});
+
+$("deleteItemBtn").onclick = () => {
+  const id = $("editId").value;
+  if (id) deleteTile(id);
+  closeModal();
+};
+
+$("previewSpeechBtn").onclick = () => speakBilingual($("zhInput").value, $("enInput").value);
+
+$("renameBoardBtn").onclick = () => {
+  currentBoard().name = $("boardNameInput").value.trim() || currentBoard().name;
+  render();
+  toast("頁面名稱已更新 / Board renamed");
+};
+
+$("deleteBoardBtn").onclick = () => {
+  if (currentBoardId === rootBoardId) {
+    toast("不可刪除首頁 / Cannot delete home");
+    return;
+  }
+  const idx = boards.findIndex(b => b.id === currentBoardId);
+  if (idx >= 0) boards.splice(idx, 1);
+  currentBoardId = rootBoardId;
+  navStack = [rootBoardId];
+  render();
+  toast("頁面已刪除 / Board deleted");
+};
+
+$("setHomeBtn").onclick = () => {
+  rootBoardId = $("homeSelect").value;
+  boards.forEach(b => b.isRoot = b.id === rootBoardId);
+  currentBoardId = rootBoardId;
+  navStack = [rootBoardId];
+  render();
+  toast("已設為首頁 / Set as home");
+};
+
+$("newHomeBtn").onclick = () => {
+  const id = uid("home");
+  const board = { id, name: "新首頁 New Home", isRoot: false, tiles: [] };
+  boards.push(board);
+  rootBoardId = id;
+  boards.forEach(b => b.isRoot = b.id === rootBoardId);
+  currentBoardId = id;
+  navStack = [id];
+  render();
+  toast("已建立新首頁 / New home created");
+};
+
+$("importBtn").onclick = () => {
+  try {
+    const data = JSON.parse($("jsonBox").value);
+    if (!Array.isArray(data)) throw new Error("Not array");
+    boards = data;
+    rootBoardId = boards.find(b => b.isRoot)?.id || boards[0].id;
+    currentBoardId = rootBoardId;
+    navStack = [rootBoardId];
+    render();
+    toast("已匯入 / Imported");
+  } catch (e) {
+    toast("JSON 格式錯誤 / Invalid JSON");
+  }
+};
+
+$("resetBtn").onclick = () => {
+  boards = structuredClone(INITIAL_BOARDS);
+  rootBoardId = boards.find(b => b.isRoot)?.id || boards[0].id;
+  currentBoardId = rootBoardId;
+  navStack = [rootBoardId];
+  sentence = [];
+  render();
+  toast("已還原範本 / Template restored");
+};
+
+$("voiceBtn").onclick = () => {
+  openEditor(true);
+  $("advancedEditor").classList.add("open");
+  toast("請在工具箱調整語音設定 / Adjust voice settings in toolbox");
+};
+
+$("testVoiceBtn").onclick = () => speakBilingual("我想買餸", "I want to buy food");
+
+if ("speechSynthesis" in window) {
+  speechSynthesis.onvoiceschanged = () => getVoices();
+}
+
+render();
+</script>
+
+
+</body></html>
